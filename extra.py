@@ -40,7 +40,7 @@ SOFTWARE = [
     ("Productividad", "muted", ["Word y PowerPoint", "Notion y Google Workspace", "n8n, Zapier y Make", "Microsoft Teams y Slack"]),
 ]
 
-LANGS = [("Español", "Nativo"), ("Inglés", "Intermedio (B1–B2)"), ("Portugués", "Intermedio"),
+LANGS = [("Español", "Nativo"), ("Inglés", "Profesional (B1–B2)"), ("Portugués", "Intermedio"),
          ("Alemán", "Básico"), ("Italiano", "Básico")]
 
 # Para agregar un certificado: ("Nombre", "Entidad", "Año", "enlace de verificación o None")
