@@ -200,59 +200,126 @@ cuándo deja de servir y cómo explicárselo a alguien que no programa. Hablo es
     build_cv(g)
 
 
+CV_PROJECTS = [
+    ("My Data Diary Analytics", "Python, pandas, Plotly",
+     "Convertí tres informes en Word en un dataset de 82 publicaciones y medí cómo cambió el contenido: el tema carrera pasó de 9 % a 48 %."),
+    ("Telco Churn: análisis SQL", "SQL, DuckDB",
+     "Nueve consultas con CTE y funciones de ventana. Un segmento con el 13 % de los clientes concentra el 38 % del ingreso perdido."),
+    ("Churn Prediction Pipeline", "scikit-learn, SQL",
+     "Umbral de decisión elegido por beneficio de negocio: +19 % frente al umbral de 0,5, con ROC-AUC de 0,842 en prueba."),
+    ("Model Drift Monitoring", "SciPy, Plotly",
+     "16 semanas de producción simuladas con PSI, KS y una política de reentrenamiento. Primera alerta en la semana 6."),
+    ("RAG Document Q&A", "Claude API, BM25",
+     "Búsqueda híbrida con filtros por fecha: 0,933 de acierto en la primera posición sobre 45 preguntas propias."),
+    ("AI CSV Analyst Agent", "Claude tool use",
+     "Agente con seis herramientas validadas, límites de pasos y de costo, y tests que corren sin conexión."),
+]
+CV_SKILLS = [
+    ("Estadística", "Inferencia, regresión, calibración, PSI, KS y chi-cuadrado, variables de confusión"),
+    ("Machine learning", "scikit-learn, validación cruzada, métricas para clases desbalanceadas, monitoreo de drift"),
+    ("Datos", "SQL (CTE, ventanas), DuckDB, PostgreSQL, MySQL, pandas, reglas de calidad de datos"),
+    ("IA generativa", "Claude API y tool use, RAG con búsqueda híbrida, evaluación de LLMs, LangChain, Ollama"),
+]
+CV_SOFTWARE = [
+    ("Análisis y BI", "R y RStudio, Excel avanzado, Power BI, Tableau, Google Sheets, Looker Studio"),
+    ("Desarrollo", "Python, VS Code, Cursor, PyCharm, Jupyter, Colab, Anaconda, Git y GitHub"),
+    ("IA y automatización", "Claude, ChatGPT, Gemini, NotebookLM, Perplexity, n8n, Zapier, Make"),
+    ("Oficina", "Word, PowerPoint, Notion, Google Workspace, Teams, Slack"),
+]
+LEVEL = {"Nativo": 5, "Profesional (B1–B2)": 4, "Intermedio": 3, "Básico": 2}
+
+
 def build_cv(g):
-    e, PROJECTS, EMAIL, LINKEDIN, GH = g["e"], g["PROJECTS"], g["EMAIL"], g["LINKEDIN"], g["GH"]
-    proj = "".join(
-        f'<li><b>{e(p["title"])}</b>. {e(p["question"])} <span class="k">{e(p["number"])} {e(p["number_label"])}</span></li>'
-        for p in PROJECTS.values())
-    skills = "".join(f'<p><b>{e(n)}:</b> {e(", ".join(items))}.</p>' for n, c, items in SKILLS)
+    e, EMAIL, LINKEDIN, GH = g["e"], g["EMAIL"], g["LINKEDIN"], g["GH"]
+    fonts = ROOT / "assets" / "cv-fonts"
+    ff = "".join(
+        f'@font-face{{font-family:"{fam}";font-weight:{w};src:url("{(fonts / f).resolve().as_uri()}") format("woff2")}}'
+        for fam, w, f in [("Public Sans", 400, "public-sans-latin-400-normal.woff2"), ("Public Sans", 500, "public-sans-latin-500-normal.woff2"),
+                          ("Public Sans", 600, "public-sans-latin-600-normal.woff2"), ("Public Sans", 700, "public-sans-latin-700-normal.woff2"),
+                          ("Bricolage", 600, "bricolage-grotesque-latin-600-normal.woff2"), ("Bricolage", 700, "bricolage-grotesque-latin-700-normal.woff2"),
+                          ("Bricolage", 800, "bricolage-grotesque-latin-800-normal.woff2"),
+                          ("JBMono", 400, "jetbrains-mono-latin-400-normal.woff2"), ("JBMono", 500, "jetbrains-mono-latin-500-normal.woff2")])
+    proj = "".join(f'<div class="proj"><div class="ph"><h4>{e(t)}</h4><span>{e(st)}</span></div><p>{e(d)}</p></div>'
+                   for t, st, d in CV_PROJECTS)
+    skills = "".join(f'<div class="sg"><h4>{e(n)}</h4><p>{e(t)}</p></div>' for n, t in CV_SKILLS)
+    soft = "".join(f'<div class="sg"><h4>{e(n)}</h4><p>{e(t)}</p></div>' for n, t in CV_SOFTWARE)
+    langs = "".join(
+        f'<li><span class="ln">{e(l)}</span><span class="dots" aria-label="{e(v)}">{"".join("<i class=on></i>" if k < LEVEL.get(v, 3) else "<i></i>" for k in range(5))}</span><span class="lv">{e(v)}</span></li>'
+        for l, v in LANGS)
     html = f"""<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Hoja de vida, Juan Manuel Herrera Mejia</title>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Public+Sans:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
 <style>
+{ff}
 @page{{size:A4;margin:0}}
-*{{box-sizing:border-box}}
-body{{margin:0;font:400 9.9pt/1.5 "Public Sans",sans-serif;color:#1d2433}}
-header{{background:#0E1420;color:#E3E9F3;padding:26px 40px 22px}}
-h1{{font:800 24pt/1 "Bricolage Grotesque",sans-serif;margin:0;letter-spacing:-.02em}}
-.sub{{margin:8px 0 10px;color:#94A2B9;font-size:10.5pt}}
-.ct{{font:8.4pt "JetBrains Mono",monospace;color:#F2C45F;display:flex;flex-wrap:wrap;gap:4px 18px}}
-.ct a{{color:inherit;text-decoration:none}}
-.bar{{height:4px;background:linear-gradient(90deg,#6CB2FF 0 33%,#4FD1B5 33% 66%,#B79CFF 66%)}}
-main{{padding:18px 40px 24px;display:grid;grid-template-columns:1.75fr 1fr;gap:26px}}
-h2{{font:700 11.5pt "Bricolage Grotesque",sans-serif;margin:14px 0 6px;padding-bottom:4px;border-bottom:1.5px solid #d7dde8;color:#0E1420}}
-h2:first-child{{margin-top:0}}
-h3{{font:600 10.2pt "Public Sans",sans-serif;margin:8px 0 1px}}
-.when{{font:8pt "JetBrains Mono",monospace;color:#5f6d86;margin:0 0 3px}}
-ul{{margin:3px 0 0;padding-left:14px}} li{{margin:2px 0}}
-p{{margin:4px 0}}
-.k{{display:block;color:#0d7d68;font-size:8.6pt}}
-aside p{{font-size:9pt}}
-</style></head><body>
-<header><h1>Juan Manuel Herrera Mejia</h1>
-<p class="sub">Estudiante de Estadística (UdeA). Análisis de datos, machine learning e IA generativa. Medellín, Colombia.</p>
-<p class="ct"><a href="mailto:{EMAIL}">{EMAIL}</a><a href="{LINKEDIN}">linkedin.com/in/juanmhmejia</a><a href="https://jmanuelhe.github.io">jmanuelhe.github.io</a><a href="{GH}">github.com/jmanuelhe</a></p></header>
-<div class="bar"></div>
-<main><div>
+*{{box-sizing:border-box;margin:0;padding:0}}
+:root{{--ink:#0E1420;--text:#262E3D;--muted:#5D6779;--line:#DCE1E9;--tint:#F3F5F9;--teal:#0F8A73;--blue:#2D6FD2;--violet:#6A4FD0}}
+html,body{{width:210mm;height:297mm}}
+body{{font:400 8.9pt/1.48 "Public Sans",sans-serif;color:var(--text);-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.page{{display:grid;grid-template-columns:1fr 68mm;height:297mm}}
+.main{{padding:15mm 9mm 12mm 15mm}}
+.side{{background:var(--tint);padding:15mm 10mm 12mm 8.5mm;border-left:1px solid var(--line)}}
+h1{{font:800 25pt/1 "Bricolage",sans-serif;color:var(--ink);letter-spacing:-.025em}}
+.role{{font:500 10.4pt/1.35 "Public Sans";color:var(--muted);margin-top:7px}}
+.rule{{height:3px;width:46mm;margin:11px 0 0;background:linear-gradient(90deg,var(--blue) 0 33.3%,var(--teal) 33.3% 66.6%,var(--violet) 66.6%)}}
+h2{{font:700 10.5pt/1 "Bricolage",sans-serif;color:var(--ink);letter-spacing:.01em;margin:17px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}}
+.side h2{{margin-top:0}} .side section+section h2{{margin-top:15px}}
+p{{margin:0}}
+.lead{{font-size:9.3pt;line-height:1.55}}
+.job{{margin-bottom:10px}}
+.jh{{display:flex;justify-content:space-between;align-items:baseline;gap:8px}}
+h3{{font:600 9.7pt/1.3 "Public Sans";color:var(--ink)}}
+.date{{font:400 7.6pt "JBMono",monospace;color:var(--muted);white-space:nowrap}}
+.org{{color:var(--muted);font-size:8.5pt;margin:1px 0 4px}}
+ul{{padding-left:11px}} li{{margin:2px 0}} li::marker{{color:var(--teal)}}
+.proj{{padding:6px 0;border-top:1px dashed var(--line)}} .proj:first-of-type{{border-top:0;padding-top:0}}
+.ph{{display:flex;justify-content:space-between;align-items:baseline;gap:8px}}
+h4{{font:600 9pt/1.3 "Public Sans";color:var(--ink)}}
+.ph span{{font:400 7.4pt "JBMono",monospace;color:var(--teal);white-space:nowrap}}
+.proj p{{color:var(--text);margin-top:1px}}
+.more{{margin-top:7px;font-size:8.3pt;color:var(--muted)}}
+.ct{{list-style:none;padding:0}} .ct li{{margin:0 0 6px;font-size:8.3pt;line-height:1.35}}
+.ct b{{display:block;font:500 7pt "JBMono",monospace;color:var(--muted);letter-spacing:.02em}}
+.ct a{{color:var(--ink);text-decoration:none}}
+.edu h3{{font-size:9.2pt}} .edu p{{font-size:8.4pt;color:var(--muted)}}
+.sg{{margin-bottom:6px}} .sg h4{{font-size:8.3pt}} .sg p{{font-size:7.9pt;color:var(--text);line-height:1.4}}
+.langs{{list-style:none;padding:0}}
+.langs li{{display:grid;grid-template-columns:15mm auto 1fr;align-items:center;gap:5px;margin:0 0 5px;font-size:8.3pt}}
+.ln{{font-weight:600;color:var(--ink)}}
+.dots{{display:flex;gap:2.5px}} .dots i{{width:5.5px;height:5.5px;border-radius:50%;background:#C9D0DC}} .dots i.on{{background:var(--teal)}}
+.lv{{font-size:7.2pt;color:var(--muted);text-align:right;white-space:nowrap}}
+</style></head><body><div class="page">
+<div class="main">
+<h1>Juan Manuel Herrera Mejia</h1>
+<p class="role">Análisis de datos, machine learning e IA generativa</p>
+<div class="rule"></div>
 <h2>Perfil</h2>
-<p>Estudiante de Estadística con dos años diseñando formación en IA generativa para empresas y un año como consultor independiente en análisis de datos.
-Construyo proyectos que se evalúan en términos de negocio, con código, datos y tests públicos.</p>
+<p class="lead">Estudiante de Estadística en la Universidad de Antioquia con dos años diseñando formación en IA generativa para empresas y un año como consultor independiente en análisis de datos. Construyo proyectos que se evalúan en términos de negocio, con código, datos y tests públicos.</p>
 <h2>Experiencia</h2>
-<p class="when">Nov. 2025 – actualidad</p><h3>Consultor independiente en análisis de datos y documentación</h3>
+<div class="job"><div class="jh"><h3>Consultor independiente en análisis de datos y documentación</h3><span class="date">nov. 2025 – hoy</span></div>
+<p class="org">Independiente, Medellín</p>
 <ul><li>Limpieza y análisis de datos en Python (pandas, SciPy) y Excel, con pruebas estadísticas y gráficos.</li>
 <li>Informes y documentos corporativos en Word y Excel: estructura, diseño y consolidación de versiones.</li>
-<li>Traducción y digitalización de documentos con OCR; uso de IA con control de calidad.</li></ul>
-<p class="when">Nov. 2024 – actualidad</p><h3>Diseñador de formación en IA para empresas</h3>
+<li>Traducción y digitalización de documentos con OCR, y uso de IA con control de calidad.</li></ul></div>
+<div class="job"><div class="jh"><h3>Diseñador de formación en IA para empresas</h3><span class="date">nov. 2024 – hoy</span></div>
+<p class="org">Independiente, Medellín</p>
 <ul><li>Curso completo sobre el uso de Claude en procesos de negocio: casos de uso, prompts y flujos de trabajo.</li>
-<li>Materiales de presentación con sistema de diseño profesional y revisión visual de calidad.</li>
-<li>Traducción al español de guías técnicas de certificación en IA.</li></ul>
-<h2>Proyectos</h2><ul>{proj}</ul>
-</div><aside>
-<h2>Educación</h2><p class="when">2024 – 2029 (esperado)</p><h3>Pregrado en Estadística</h3><p>Universidad de Antioquia, Medellín.</p>
-<h2>Habilidades</h2>{skills}
-<h2>Software</h2>{"".join(f"<p><b>{e(n)}:</b> {e(chr(44).join(chr(32)+x for x in items).strip())}.</p>" for n, c, items in SOFTWARE)}
-<h2>Idiomas</h2>{"".join(f"<p>{e(l)}, {e(v[0].lower() + v[1:])}.</p>" for l, v in LANGS)}
-<h2>Portafolio</h2><p>Seis proyectos organizados por rol (analista, científico de datos, ingeniero de IA) en jmanuelhe.github.io.</p>
-</aside></main></body></html>"""
+<li>Materiales de presentación con un sistema de diseño profesional y revisión visual de calidad.</li>
+<li>Traducción al español de guías técnicas de certificación en IA.</li></ul></div>
+<h2>Proyectos</h2>
+{proj}
+<p class="more">Código, datos y tests de cada proyecto: github.com/jmanuelhe</p>
+</div>
+<aside class="side">
+<section><h2>Contacto</h2><ul class="ct">
+<li><b>Correo</b><a href="mailto:{EMAIL}">{EMAIL}</a></li>
+<li><b>Portafolio</b><a href="https://jmanuelhe.github.io">jmanuelhe.github.io</a></li>
+<li><b>LinkedIn</b><a href="{LINKEDIN}">linkedin.com/in/juanmhmejia</a></li>
+<li><b>GitHub</b><a href="{GH}">github.com/jmanuelhe</a></li>
+<li><b>Ubicación</b>Medellín, Colombia</li></ul></section>
+<section class="edu"><h2>Educación</h2><h3>Pregrado en Estadística</h3><p>Universidad de Antioquia</p><p class="date">2024 – 2029 (esperado)</p></section>
+<section><h2>Habilidades</h2>{skills}</section>
+<section><h2>Software</h2>{soft}</section>
+<section><h2>Idiomas</h2><ul class="langs">{langs}</ul></section>
+</aside></div></body></html>"""
     src = ROOT / "assets" / "cv.html"
     src.write_text(html, encoding="utf-8")
     import asyncio
@@ -263,8 +330,11 @@ Construyo proyectos que se evalúan en términos de negocio, con código, datos 
             b = await p.chromium.launch()
             pg = await b.new_page()
             await pg.goto(src.resolve().as_uri())
-            await pg.wait_for_timeout(1500)
-            await pg.pdf(path=str(ROOT / g["CV"]), format="A4", print_background=True)
+            await pg.evaluate("document.fonts.ready")
+            await pg.wait_for_timeout(800)
+            h = await pg.evaluate("[...document.querySelectorAll('.main,.side')].map(x=>{const r=[...x.children].pop().getBoundingClientRect();return Math.round(r.bottom)})")
+            print("alto de contenido (px):", h, "de", round(297 * 96 / 25.4))
+            await pg.pdf(path=str(ROOT / g["CV"]), format="A4", print_background=True, prefer_css_page_size=True)
             await b.close()
     asyncio.run(run())
     src.unlink()
