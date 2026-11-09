@@ -177,7 +177,9 @@ def head(title, desc):
 <meta name="description" content="{e(desc)}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
-<meta property="og:image" content="https://jmanuelhe.github.io/assets/og.png">
+<meta property="og:image" content="https://jmanuelhe.github.io/assets/og.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
 <meta property="og:url" content="https://jmanuelhe.github.io/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
